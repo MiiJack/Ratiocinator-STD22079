@@ -1,19 +1,19 @@
 package org.mii;
 
-import org.mii.affirmations.Affirmation;
+import org.mii.affirmation.Affirmation;
+import org.mii.conjonctions.Conjonction;
 
 public class CalculusRatiocinator {
-  public static Resultat calculer(Affirmation affirmation) {
-    switch (affirmation.statutAffirmation()) {
-      case MENSONGE -> {
-        return Resultat.FAUX;
-      }
-      case VERITE -> {
-        return Resultat.VRAI;
-      }
-      default -> {
-        return Resultat.JENESAISPAS;
-      }
+  public static String calculer(Affirmation affirmation) {
+    if (affirmation.getConjonction() != null) {
+      Conjonction conjonction = affirmation.getConjonction();
+      String statusLeft = calculer(conjonction.getPremièreAffirmation());
+      String statusRight = calculer(conjonction.getDeuxièmeAffirmation());
+
+      return conjonction.evaluer(statusLeft, statusRight);
+    } else {
+      System.out.println(affirmation.getStatut());
+      return affirmation.getStatut();
     }
   }
 }

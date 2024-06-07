@@ -1,37 +1,62 @@
 package org.mii;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
-import org.mii.affirmations.Affirmation;
+import org.mii.affirmation.Affirmation;
+import org.mii.affirmation.Mensonge;
+import org.mii.affirmation.Verite;
 import org.mii.conjonctions.Donc;
 import org.mii.conjonctions.Et;
 import org.mii.conjonctions.Ou;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mii.Resultat.FAUX;
-import static org.mii.Resultat.VRAI;
-import static org.mii.affirmations.StatutAffirmation.*;
-
 class CalculusRatiocinatorTest {
   @Test
+  void statutDeVéritéEstVrai() {
+    Verite louEstBeau = new Verite("Lou est beau");
+    assertEquals("VRAI", louEstBeau.getStatut());
+  }
+
+  @Test
+  void statutDeMensongeEstFaux() {
+    Mensonge louEstPauvre = new Mensonge("Lou est pauvre");
+    assertEquals("FAUX", louEstPauvre.getStatut());
+  }
+
+  @Test
+  void statutDAffirmationEstJeNeSaisPasParDefaut() {
+    Affirmation louEstGénéreux = new Affirmation("Lou est généreux");
+    assertEquals("JENESAISPAS", louEstGénéreux.getStatut());
+  }
+
+  @Test
   public void calculus_ratiocinator_autour_de_lou() {
-    var verite1 = new Affirmation("Lou est beau", VERITE);
-    var mensonge1 = new Affirmation("Lou est pauvre", MENSONGE);
-    var affirmation1 = new Affirmation("Lou est généreux", AFFIRMATION);
+    var verite1 = new Verite("Lou est beau");
+    var mensonge1 = new Mensonge("Lou est pauvre");
+    var affirmation1 = new Affirmation("Lou est généreux");
 
-    var louEstPauvreEtLouEstGenereux = mensonge1.joindre(new Et(), affirmation1);
-    assertEquals(CalculusRatiocinator.calculer(louEstPauvreEtLouEstGenereux), FAUX);
+    var louEstPauvreEtLouEstGenereux = new Affirmation(new Et(mensonge1, affirmation1));
+    assertEquals("FAUX", CalculusRatiocinator.calculer(louEstPauvreEtLouEstGenereux));
 
-    var louEstBeauDoncLouEstPauvre = verite1.joindre(new Donc(), mensonge1);
-    assertEquals(CalculusRatiocinator.calculer(louEstBeauDoncLouEstPauvre), FAUX);
+    var louEstBeauDoncLouEstPauvre = new Affirmation(new Donc(verite1, mensonge1));
+    assertEquals("FAUX", CalculusRatiocinator.calculer(louEstBeauDoncLouEstPauvre));
 
-    var louEstPauvreDoncLouEstGenereux = mensonge1.joindre(new Donc(), affirmation1);
-    assertEquals(CalculusRatiocinator.calculer(louEstPauvreDoncLouEstGenereux), VRAI);
+    var louEstPauvreDoncLouEstGenereux = new Affirmation(new Donc(mensonge1, affirmation1));
+    assertEquals("VRAI", CalculusRatiocinator.calculer(louEstPauvreDoncLouEstGenereux));
 
-    var louEstBeauOuLouEstGenereuxDoncLouEstPauvre = verite1.joindre(new Ou(), affirmation1).joindre(new Donc(), mensonge1);
-    assertEquals(CalculusRatiocinator.calculer(louEstBeauOuLouEstGenereuxDoncLouEstPauvre), FAUX);
+    var louEstBeauOuLouEstGenereux = new Affirmation(new Ou(verite1, affirmation1));
+    var louEstBeauOuLouEstGenereuxDoncLouEstPauvre =
+        new Affirmation(new Donc(louEstBeauOuLouEstGenereux, mensonge1));
+    assertEquals(
+        "FAUX", CalculusRatiocinator.calculer(louEstBeauOuLouEstGenereuxDoncLouEstPauvre));
 
-    var louEstPauvreOuLouEstGenereux = mensonge1.joindre(new Ou(), affirmation1);
-    var louEstBeauOuLouEstGenereuxDoncLouEstPauvreEtLouEstPauvreOuLouEstGenereux = louEstBeauOuLouEstGenereuxDoncLouEstPauvre.joindre(new Et(), louEstPauvreOuLouEstGenereux);
-    assertEquals(CalculusRatiocinator.calculer(louEstBeauOuLouEstGenereuxDoncLouEstPauvreEtLouEstPauvreOuLouEstGenereux), FAUX);
+    var louEstPauvreOuLouEstGenereux = new Affirmation(new Ou(mensonge1, affirmation1));
+    var louEstBeauOuLouEstGenereuxDoncLouEstPauvreEtLouEstPauvreOuLouEstGenereux =
+        new Affirmation(
+            new Et(louEstBeauOuLouEstGenereuxDoncLouEstPauvre, louEstPauvreOuLouEstGenereux));
+    assertEquals(
+        "FAUX",
+        CalculusRatiocinator.calculer(
+            louEstBeauOuLouEstGenereuxDoncLouEstPauvreEtLouEstPauvreOuLouEstGenereux));
   }
-  }
+}

@@ -1,22 +1,20 @@
 package org.mii.conjonctions;
 
-import static org.mii.affirmations.StatutAffirmation.*;
-
-import org.mii.affirmations.StatutAffirmation;
+import org.mii.affirmation.Affirmation;
 
 public final class Donc extends Conjonction {
-  public Donc() {
-    super(" donc ");
+  public Donc(Affirmation premièreAffirmation, Affirmation deuxièmeAffirmation) {
+    super(" donc ", premièreAffirmation, deuxièmeAffirmation);
   }
 
   @Override
-  public StatutAffirmation evaluer(
-      StatutAffirmation statutAffirmation1, StatutAffirmation statutAffirmation2) {
-    if (statutAffirmation1.equals(VERITE) && statutAffirmation2.equals(MENSONGE)) {
-      return MENSONGE;
-    } else if (statutAffirmation1.equals(VERITE) && statutAffirmation2.equals(AFFIRMATION)) {
-      return AFFIRMATION;
+  public String evaluer(String statutAffirmation1, String statutAffirmation2) {
+    if (statutAffirmation1.equals("VRAI") && statutAffirmation2.equals("FAUX")) {
+      return "FAUX";
+    } else if (statutAffirmation1.equals("FAUX") || statutAffirmation2.equals("VRAI")) {
+      return "VRAI";
+    } else {
+      return "JENESAISPAS";
     }
-    return VERITE;
   }
 }
